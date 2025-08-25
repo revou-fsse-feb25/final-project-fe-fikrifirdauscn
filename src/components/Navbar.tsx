@@ -3,19 +3,30 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { decodeToken } from '@/utils/jwt';
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState<'USER' | 'ADMIN' | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    if (token) {
+      const decodedToken = decodeToken(token);
+      if (decodedToken) {
+        setUserRole(decodedToken.role);
+      } else {
+        setUserRole(null);
+        localStorage.removeItem('token');
+      }
+    } else {
+      setUserRole(null);
+    }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    setIsLoggedIn(false);
+    setUserRole(null);
     router.push('/login');
   };
 
@@ -29,8 +40,13 @@ export default function Navbar() {
           <Link href="/events" className="text-gray-600 hover:text-blue-500">
             Events
           </Link>
-          {isLoggedIn ? (
+          {userRole ? (
             <>
+              {userRole === 'ADMIN' && (
+                <Link href="/admin/dashboard" className="text-gray-600 hover:text-blue-500">
+                  Admin
+                </Link>
+              )}
               <Link href="/dashboard" className="text-gray-600 hover:text-blue-500">
                 Dashboard Saya
               </Link>
