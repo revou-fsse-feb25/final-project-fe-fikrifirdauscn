@@ -1,20 +1,27 @@
+// src/app/login/page.tsx
 'use client';
+
 import { useState } from 'react';
 import { apiClient } from '@/services/api';
 import { useRouter } from 'next/navigation';
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     try {
       const response = await apiClient.post('/auth/login', { email, password });
       const { access_token, user } = response.data;
+
       localStorage.setItem('token', access_token);
+
       alert(`Login berhasil! Selamat datang, ${user.name || user.email}`);
+
       const redirectUrl = localStorage.getItem('redirectUrl');
       if (redirectUrl) {
         localStorage.removeItem('redirectUrl');
@@ -22,6 +29,7 @@ export default function LoginPage() {
       } else {
         router.push('/');
       }
+
       router.refresh();
     } catch (err: any) {
       if (err.response) {
@@ -31,6 +39,7 @@ export default function LoginPage() {
       }
     }
   };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <form onSubmit={handleSubmit} className="p-8 bg-white rounded shadow-md w-96">

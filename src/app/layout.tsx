@@ -21,14 +21,11 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-light-text 
-          bg-gradient-to-b from-dark-blue to-light-dark-blue min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-light-text bg-gradient-to-b from-dark-blue to-light-dark-blue min-h-screen`}
       >
         <Navbar />
 
@@ -37,10 +34,7 @@ export default function RootLayout({
           Tailwind Test — Kalau kotak merah ini muncul, Tailwind aktif ✅
         </div>
 
-        <main className="pt-20">
-          {children}
-        </main>
-
+        <main className="pt-20">{children}</main>
         <Footer />
       </body>
     </html>

@@ -1,7 +1,15 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Tailwind v4: cukup import sekali */
+@import "tailwindcss";
 
+/* Definisikan design tokens (theme) di sini */
+@theme {
+  --color-dark-blue: #25283D;
+  --color-light-dark-blue: #31354F;
+  --color-magenta: #8F3985;
+  --color-light-text: #E5E7EB;
+}
+
+/* (Opsional) style global kamu */
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -18,10 +26,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
+  background:
+    linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
     rgb(var(--background-start-rgb));
 }
