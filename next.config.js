@@ -26,7 +26,30 @@ const nextConfig = {
         port: '',
         pathname: '**',
       },
-      
+      {
+        protocol: 'https',
+        hostname: 'img.jakpost.net',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'pbs.twimg.com',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'asset.kompas.com',
+        port: '',
+        pathname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'encrypted-tbn1.gstatic.com',
+        port: '',
+        pathname: '**',
+      },
     ],
   },
 };

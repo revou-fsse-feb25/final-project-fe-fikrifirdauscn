@@ -8,41 +8,42 @@ interface EventCardProps {
     date: string;
     location: string;
     artist: string;
-    price: number;
     imageUrl?: string;
   };
 }
 
 export default function EventCard({ event }: EventCardProps) {
+  const formattedDate = new Date(event.date).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105">
-      <div className="relative w-full h-48">
-        <Image
-          src={event.imageUrl || 'https://via.placeholder.com/400x300'}
-          alt={event.name}
-          layout="fill"
-          objectFit="cover"
-        />
-      </div>
-      <div className="p-5">
-        <h3 className="text-xl font-bold text-gray-800 line-clamp-2">{event.name}</h3>
-        <p className="text-sm text-gray-500 mt-2">{event.artist}</p>
-        <p className="text-sm text-gray-500 mt-1">
-          {new Date(event.date).toLocaleString()}
-        </p>
-        <p className="text-sm text-gray-500">{event.location}</p>
-        <div className="mt-4 flex justify-between items-center">
-          <span className="text-lg font-bold text-blue-600">
-            Rp {event.price.toLocaleString('id-ID')}
-          </span>
-          <Link
-            href={`/events/${event.id}`}
-            className="bg-blue-500 text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-blue-600 transition-colors"
-          >
-            Lihat Detail
-          </Link>
+    <Link href={`/events/${event.id}`}>
+      <div className="flex-none w-72 bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105 cursor-pointer">
+        <div className="relative w-full h-48">
+          <Image
+            src={event.imageUrl || 'https://via.placeholder.com/400x300'}
+            alt={event.name}
+            layout="fill"
+            objectFit="cover"
+          />
+          <div className="absolute bottom-0 left-0 bg-purple-700 text-white px-4 py-2 text-sm font-semibold">
+            {formattedDate}
+          </div>
+        </div>
+        <div className="p-4">
+          <h3 className="text-lg font-bold text-gray-800 line-clamp-2">{event.name}</h3>
+          <p className="text-sm text-gray-500 mt-2 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            {event.location}
+          </p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

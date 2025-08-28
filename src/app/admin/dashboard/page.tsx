@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { apiClient } from '@/services/api';
 import { useRouter } from 'next/navigation';
 import { decodeToken } from '@/utils/jwt';
+import Link from 'next/link'; 
 
 interface Booking {
   id: string;
@@ -70,6 +71,14 @@ export default function AdminDashboardPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Dashboard Admin</h1>
+      <div className="flex justify-center space-x-4 mb-8">
+        <Link href="/admin/dashboard" className="bg-blue-500 text-white p-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors">
+          Lihat Semua Pemesanan
+        </Link>
+        <Link href="/admin/dashboard/events" className="bg-blue-500 text-white p-4 rounded-lg shadow-md hover:bg-blue-600 transition-colors">
+          Kelola Event
+        </Link>
+      </div>
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-xl font-semibold mb-4">Semua Pemesanan</h2>
         {bookings.length > 0 ? (

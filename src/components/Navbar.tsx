@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { decodeToken } from '@/utils/jwt';
 
 export default function Navbar() {
   const [userRole, setUserRole] = useState<'USER' | 'ADMIN' | null>(null);
   const router = useRouter();
-
+  const pathname = usePathname();
+  
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -22,32 +23,32 @@ export default function Navbar() {
     } else {
       setUserRole(null);
     }
-  }, []);
+  }, [pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     setUserRole(null);
     router.push('/login');
   };
-
+  
   return (
-    <nav className="bg-white shadow-md">
+    <nav className="fixed top-0 left-0 w-full z-20 bg-white shadow-md">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-gray-800">
           EventHub
         </Link>
-        <div className="flex items-center space-x-4">
-          <Link href="/events" className="text-gray-600 hover:text-blue-500">
+        <div className="flex items-center space-x-6">
+          <Link href="/events" className="text-gray-600 hover:text-blue-500 transition-colors">
             Events
           </Link>
           {userRole ? (
             <>
               {userRole === 'ADMIN' && (
-                <Link href="/admin/dashboard" className="text-gray-600 hover:text-blue-500">
+                <Link href="/admin/dashboard" className="text-gray-600 hover:text-blue-500 transition-colors">
                   Admin
                 </Link>
               )}
-              <Link href="/dashboard" className="text-gray-600 hover:text-blue-500">
+              <Link href="/dashboard" className="text-gray-600 hover:text-blue-500 transition-colors">
                 Dashboard Saya
               </Link>
               <button
