@@ -1,3 +1,4 @@
+// src/app/login/page.tsx
 'use client';
 
 import { useState } from 'react';
@@ -10,20 +11,17 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     try {
       const response = await apiClient.post('/auth/login', { email, password });
-      const { access_token, user } = response.data as {
-        access_token: string;
-        user: { name?: string; email?: string };
-      };
-
+      const { access_token, user } = response.data;
+      
       localStorage.setItem('token', access_token);
-
-      alert(`Login berhasil! Selamat datang, ${user.name || user.email || 'pengguna'}`);
-
+      
+      alert(`Login berhasil! Selamat datang, ${user.name || user.email}`);
+      
       const redirectUrl = localStorage.getItem('redirectUrl');
       if (redirectUrl) {
         localStorage.removeItem('redirectUrl');
@@ -31,10 +29,11 @@ export default function LoginPage() {
       } else {
         router.push('/');
       }
+      
       router.refresh();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message || 'Terjadi kesalahan. Mohon coba lagi.');
+    } catch (err: any) {
+      if (err.response) {
+        setError(err.response.data.message);
       } else {
         setError('Terjadi kesalahan. Mohon coba lagi.');
       }
@@ -42,43 +41,40 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="p-8 bg-white rounded shadow-md w-96">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-dark-blue text-light-text">
+      <form onSubmit={handleSubmit} className="p-8 bg-light-dark-blue rounded shadow-md w-96">
         <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+          <label className="block text-sm font-bold mb-2" htmlFor="email">
             Email
           </label>
           <input
             id="email"
             type="email"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark-blue text-light-text border-gray-600"
             value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
         </div>
-
         <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+          <label className="block text-sm font-bold mb-2" htmlFor="password">
             Password
           </label>
           <input
             id="password"
             type="password"
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+            className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-dark-blue text-light-text border-gray-600"
             value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-
         <div className="flex items-center justify-between">
           <button
             type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-magenta hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           >
             Masuk
           </button>

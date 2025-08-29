@@ -1,3 +1,4 @@
+// src/app/admin/dashboard/events/page.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -45,12 +46,8 @@ export default function AdminManageEventsPage() {
       });
       setEvents(response.data);
       setError(null);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message || 'Gagal mengambil data event.');
-      } else {
-        setError('Gagal mengambil data event.');
-      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Gagal mengambil data event.');
     } finally {
       setLoading(false);
       setIsFormVisible(false);
@@ -62,7 +59,7 @@ export default function AdminManageEventsPage() {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = decodeToken(token);
-      if (!decodedToken || decodedToken.role !== 'ADMIN') {
+      if (decodedToken?.role !== 'ADMIN') {
         alert('Akses ditolak. Anda bukan admin.');
         router.push('/');
       } else {
@@ -78,22 +75,18 @@ export default function AdminManageEventsPage() {
 
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
+      if (!token) return router.push('/login');
 
       await apiClient.delete(`/events/${eventId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert('Event berhasil dihapus!');
-      fetchEvents();
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message || 'Gagal menghapus event.');
-      } else {
-        setError('Gagal menghapus event.');
-      }
+
+      // Perbarui state secara lokal
+      setEvents(events.filter(event => event.id !== eventId));
+
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Gagal menghapus event.');
     }
   };
 
@@ -110,7 +103,7 @@ export default function AdminManageEventsPage() {
   return (
     <div className="container mx-auto px-4 py-8 text-light-text">
       <h1 className="text-3xl font-bold text-center mb-8">Manajemen Event</h1>
-      
+
       <div className="flex justify-center space-x-4 mb-8">
         <Link 
           href="/admin/dashboard" 
@@ -140,7 +133,7 @@ export default function AdminManageEventsPage() {
             <EventForm initialEvent={selectedEvent ?? undefined} onSuccess={fetchEvents} />
           </div>
         )}
-        
+
         {events.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left bg-light-dark-blue">

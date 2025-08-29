@@ -1,17 +1,14 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { decodeToken } from '@/utils/jwt';
-
 export default function Navbar() {
   const [userRole, setUserRole] = useState<'USER' | 'ADMIN' | null>(null);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
-
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -26,41 +23,32 @@ export default function Navbar() {
       setUserRole(null);
     }
   }, [pathname]);
-
-  
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window !== 'undefined') {
         if (window.scrollY > lastScrollY) {
-          
           setIsVisible(false);
         } else {
-          
           setIsVisible(true);
         }
         setLastScrollY(window.scrollY);
       }
     };
-
     if (typeof window !== 'undefined') {
       window.addEventListener('scroll', handleScroll);
     }
-
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('scroll', handleScroll);
       }
     };
   }, [lastScrollY]);
-
   const handleLogout = () => {
     localStorage.removeItem('token');
     setUserRole(null);
     router.push('/login');
   };
-
   const isHomepage = pathname === '/';
-
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-20 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'} ${isHomepage ? 'bg-transparent text-white' : 'bg-dark-blue shadow-md text-light-text'}`}

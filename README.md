@@ -1,36 +1,141 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Music Events – Frontend (Next.js)
 
-## Getting Started
+## 1) Project Description
+A lightweight Next.js frontend for browsing music events. It provides a responsive UI to explore events, filter by category or name, and view event details. It is designed to work with a NestJS backend via direct calls or through a built-in proxy for cookie-based authentication.
 
-First, run the development server:
+---
 
-```bash
+## 2) List of Features
+- Browse list of events with search (by name/artist) and category filter
+- Event detail view (date, location, artist, price, availability, image)
+- Category dropdown sourced from backend
+- Configurable API access:
+  - **Direct mode** (call backend domain)
+  - **Proxy mode** (use Next.js API routes → simplifies cookies/CORS)
+- Basic error states and loading indicators
+- Ready for cookie-only auth backends (no localStorage token needed)
+
+---
+
+## 3) Tech Stack Used
+- **Framework**: Next.js (React, App Router)
+- **Language**: TypeScript
+- **HTTP Client**: Axios
+- **Styling**: Tailwind CSS (and utility classes)
+- **Icons/UI (optional)**: lucide-react, shadcn/ui (if included)
+- **Tooling**: ESLint, Prettier (optional scripts)
+
+---
+
+## 4) Installation & Usage Instructions
+
+### Prerequisites
+- Node.js 18+ (or current LTS)
+- A running backend (NestJS) that exposes `/api` routes (events, categories)
+
+### Environment Variables
+Create a `.env.local` with one of the following setups:
+
+**A. Proxy Mode (recommended for cookie-based auth)**
+
+## Use Next.js API routes as a proxy (first-party cookies)
+### NEXT_PUBLIC_USE_PROXY=1
+**B. Direct Mode**
+
+## Directly call your backend base URL (must include /api server prefix if used)
+NEXT_PUBLIC_API_BASE=https://final-project-be-fikrifirdauscn-production.up.railway.app/
+NEXT_PUBLIC_USE_PROXY=0
+
+
+> **Notes**
+> - Proxy mode simplifies CORS and cookies (SameSite=Lax).
+> - Direct mode across domains requires backend cookies set with `SameSite=None; Secure` and proper CORS.
+
+### Install & Run
+```bash```
+# Install dependencies
+npm install
+
+# Development
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Production build & run
+npm run build
+npm run start
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Project Scripts (typical)
+npm run lint         # Lint
+npm run format       # Format (if configured)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+---
+## 5) Links to Frontend:
+Frontend: (https://final-project-be-fikrifirdauscn-production.up.railway.app/)
 
-To learn more about Next.js, take a look at the following resources:
+---
+## 6) Screenshots:
+<img src=docs/screenshots/Snipaste_2025-08-29_23-53-38.png>
+<img src=docs/screenshots/Snipaste_2025-08-29_23-54-20.png>
+<img src=docs/screenshots/Snipaste_2025-08-29_23-54-34.png>
+<img src=docs/screenshots/Snipaste_2025-08-29_23-54-42.png>
+<img src=docs/screenshots/Snipaste_2025-08-29_23-55-03.png>
+<img src=docs/screenshots/Snipaste_2025-08-29_23-55-03.png>
+<img src=docs/screenshots/Snipaste_2025-08-29_23-55-13.png>
+<img src=docs/screenshots/Snipaste_2025-08-29_23-55-44.png>
+<img src=docs/screenshots/Snipaste_2025-08-29_23-56-18.png>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
+## 7) ERD on Documentation:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+erDiagram
+  CATEGORY ||--o{ EVENT : "has many"
+  CATEGORY {
+    string id PK
+    string name
+    datetime createdAt optional
+    datetime updatedAt optional
+  }
+  EVENT {
+    string id PK
+    string name
+    string description optional
+    datetime date
+    string location
+    string artist
+    decimal price
+    int totalTickets
+    int availableTickets
+    string imageUrl optional
+    string categoryId FK optional
+    datetime createdAt optional
+    datetime updatedAt optional
+  }
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Table category {
+  id          varchar [pk]
+  name        varchar
+  created_at  timestamp
+  updated_at  timestamp
+}
+
+Table event {
+  id                varchar [pk]
+  name              varchar
+  description       text
+  date              timestamp
+  location          varchar
+  artist            varchar
+  price             decimal(12,2)
+  total_tickets     int
+  available_tickets int
+  image_url         varchar
+  category_id       varchar [ref: > category.id] // optional
+  created_at        timestamp
+  updated_at        timestamp
+}
+
+Ref: category.id < event.category_id
+
+
