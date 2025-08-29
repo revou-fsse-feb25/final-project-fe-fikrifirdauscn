@@ -13,7 +13,7 @@ module.exports = {
         'magenta': '#8F3985',
         'light-text': '#E5E7EB',
         'black': '#000000',
-        'deep-blue': '#28002aff', // <-- Tambahkan ini
+        'deep-blue': '#28002aff',
       },
     },
   },

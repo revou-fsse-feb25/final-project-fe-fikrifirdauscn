@@ -1,4 +1,3 @@
-// src/components/Navbar.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -8,8 +7,8 @@ import { decodeToken } from '@/utils/jwt';
 
 export default function Navbar() {
   const [userRole, setUserRole] = useState<'USER' | 'ADMIN' | null>(null);
-  const [isVisible, setIsVisible] = useState(true); // <-- Tambahkan state ini
-  const [lastScrollY, setLastScrollY] = useState(0); // <-- Tambahkan state ini
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -28,15 +27,15 @@ export default function Navbar() {
     }
   }, [pathname]);
 
-  // Logika scroll Navbar
+  
   useEffect(() => {
     const handleScroll = () => {
       if (typeof window !== 'undefined') {
         if (window.scrollY > lastScrollY) {
-          // Jika scroll ke bawah
+          
           setIsVisible(false);
         } else {
-          // Jika scroll ke atas
+          
           setIsVisible(true);
         }
         setLastScrollY(window.scrollY);

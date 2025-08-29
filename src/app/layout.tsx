@@ -19,8 +19,7 @@ export const metadata: Metadata = {
   description: "Generated with Next.js & Tailwind CSS",
 };
 
-// src/app/layout.tsx
-// ...
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,7 +31,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased text-light-text`}
       >
         <Navbar />
-        <main className="pt-20 bg-black min-h-screen"> {/* <-- Ganti bg-dark-blue di sini */}
+        <main className="pt-20 bg-black min-h-screen"> 
           {children}
         </main>
         <Footer />

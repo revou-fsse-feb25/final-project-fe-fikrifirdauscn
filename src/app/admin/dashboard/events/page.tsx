@@ -1,4 +1,3 @@
-// src/app/admin/dashboard/events/page.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';

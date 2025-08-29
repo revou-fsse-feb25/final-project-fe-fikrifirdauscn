@@ -52,19 +52,19 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'www.gravatar.com', // <-- Tambahkan ini
+        hostname: 'www.gravatar.com',
         port: '',
         pathname: '**',
       },
       {
         protocol: 'https',
-        hostname: 'i.scdn.co', // <-- Tambahkan ini
+        hostname: 'i.scdn.co',
         port: '',
         pathname: '**',
       },
       {
         protocol: 'https',
-        hostname: 'cdn.rri.co.id', // <-- Tambahkan ini
+        hostname: 'cdn.rri.co.id',
         port: '',
         pathname: '**',
       },

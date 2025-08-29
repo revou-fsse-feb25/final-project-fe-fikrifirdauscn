@@ -1,4 +1,3 @@
-// src/app/dashboard/DashboardClient.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -30,7 +29,6 @@ export default function DashboardClient() {
   useEffect(() => {
     if (searchParams.get('bookingSuccess') === 'true') {
       setShowNotification(true);
-      // Hapus parameter dari URL setelah notifikasi muncul
       const newUrl = window.location.pathname;
       router.replace(newUrl);
     }

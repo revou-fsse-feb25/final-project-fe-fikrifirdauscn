@@ -1,4 +1,3 @@
-// src/components/EventForm.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,7 +8,7 @@ interface EventFormProps {
     id: string;
     name: string;
     description?: string;
-    date: string; // ISO string
+    date: string; 
     location: string;
     artist: string;
     price: number;
@@ -23,7 +22,7 @@ interface EventFormProps {
 type EventPayload = {
   name: string;
   description: string;
-  date: string; // 'YYYY-MM-DDTHH:mm'
+  date: string;
   location: string;
   artist: string;
   price: number;
@@ -64,7 +63,6 @@ export default function EventForm({ initialEvent, onSuccess }: EventFormProps) {
         });
         setCategories(response.data as Category[]);
       } catch {
-        // sengaja diabaikan: kategori gagal fetch tidak memblok form
       }
     };
     fetchCategories();

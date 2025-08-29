@@ -1,8 +1,7 @@
-// src/app/dashboard/page.tsx
 import { Suspense } from 'react';
 import DashboardClient from './DashboardClient';
 
-export const dynamic = 'force-dynamic'; // aman untuk halaman yang bergantung pada URL/localStorage
+export const dynamic = 'force-dynamic';
 
 export default function UserDashboardPage() {
   return (

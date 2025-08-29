@@ -1,4 +1,3 @@
-// src/app/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -45,7 +44,7 @@ export default function Home() {
 
   return (
     <div className="bg-black">
-      {/* Hero Section */}
+      
       <div className="relative min-h-[90vh] flex items-center justify-center text-white">
         <Image
           src="https://images.unsplash.com/photo-1470229538611-16ba8c7ffbd7?q=80&w=2340&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxwxM3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
@@ -72,7 +71,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Upcoming Concerts Section */}
+      
       <div id="upcoming-events" className="container mx-auto px-4 py-16">
         <div className="bg-dark-blue p-8 rounded-lg shadow-xl">
           <h2 className="text-4xl font-bold text-center text-light-text mb-12">
@@ -96,7 +95,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Artist Lineup Section */}
+     
       {uniqueArtists.length > 0 && (
         <div className="container mx-auto px-4 py-16 text-light-text">
           <div className="bg-dark-blue p-8 rounded-lg shadow-xl">
@@ -115,7 +114,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Why Choose Us Section */}
       <div className="container mx-auto px-4 py-16 text-light-text">
         <div className="bg-dark-blue p-8 rounded-lg shadow-xl">
           <h2 className="text-4xl font-bold text-center mb-12">
