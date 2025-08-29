@@ -9,7 +9,7 @@ interface EventFormProps {
     id: string;
     name: string;
     description?: string;
-    date: string;
+    date: string; // ISO string
     location: string;
     artist: string;
     price: number;
@@ -20,10 +20,27 @@ interface EventFormProps {
   onSuccess: () => void;
 }
 
+type EventPayload = {
+  name: string;
+  description: string;
+  date: string; // 'YYYY-MM-DDTHH:mm'
+  location: string;
+  artist: string;
+  price: number;
+  totalTickets: number;
+  imageUrl: string;
+  categoryId: string;
+};
+
+interface Category {
+  id: string;
+  name: string;
+}
+
 export default function EventForm({ initialEvent, onSuccess }: EventFormProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<EventPayload>({
     name: '',
-    description: '', // <-- Tipe string
+    description: '',
     date: '',
     location: '',
     artist: '',
@@ -32,7 +49,7 @@ export default function EventForm({ initialEvent, onSuccess }: EventFormProps) {
     imageUrl: '',
     categoryId: '',
   });
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -43,11 +60,11 @@ export default function EventForm({ initialEvent, onSuccess }: EventFormProps) {
       try {
         const token = localStorage.getItem('token');
         const response = await apiClient.get('/categories', {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
-        setCategories(response.data);
-      } catch (err) {
-        console.error('Failed to fetch categories:', err);
+        setCategories(response.data as Category[]);
+      } catch {
+        // sengaja diabaikan: kategori gagal fetch tidak memblok form
       }
     };
     fetchCategories();
@@ -69,15 +86,17 @@ export default function EventForm({ initialEvent, onSuccess }: EventFormProps) {
     }
   }, [initialEvent, isEditMode]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: ['price', 'totalTickets'].includes(name) ? Number(value) : value,
-    }));
+    }) as EventPayload);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -90,7 +109,7 @@ export default function EventForm({ initialEvent, onSuccess }: EventFormProps) {
     }
 
     try {
-      if (isEditMode) {
+      if (isEditMode && initialEvent) {
         await apiClient.patch(`/events/${initialEvent.id}`, formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -102,8 +121,12 @@ export default function EventForm({ initialEvent, onSuccess }: EventFormProps) {
         alert('Event berhasil ditambahkan!');
       }
       onSuccess();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Terjadi kesalahan saat menyimpan event.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Terjadi kesalahan saat menyimpan event.');
+      } else {
+        setError('Terjadi kesalahan saat menyimpan event.');
+      }
     } finally {
       setLoading(false);
     }
@@ -112,48 +135,123 @@ export default function EventForm({ initialEvent, onSuccess }: EventFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && <p className="text-red-500 text-sm">{error}</p>}
+
       <div>
         <label className="block text-gray-700">Nama Event</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} required className="w-full border p-2 rounded" />
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
+
       <div>
         <label className="block text-gray-700">Deskripsi</label>
-        <textarea name="description" value={formData.description} onChange={handleChange} rows={4} className="w-full border p-2 rounded" />
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          rows={4}
+          className="w-full border p-2 rounded"
+        />
       </div>
+
       <div>
         <label className="block text-gray-700">Tanggal & Waktu</label>
-        <input type="datetime-local" name="date" value={formData.date} onChange={handleChange} required className="w-full border p-2 rounded" />
+        <input
+          type="datetime-local"
+          name="date"
+          value={formData.date}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
+
       <div>
         <label className="block text-gray-700">Lokasi</label>
-        <input type="text" name="location" value={formData.location} onChange={handleChange} required className="w-full border p-2 rounded" />
+        <input
+          type="text"
+          name="location"
+          value={formData.location}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
+
       <div>
         <label className="block text-gray-700">Artis</label>
-        <input type="text" name="artist" value={formData.artist} onChange={handleChange} required className="w-full border p-2 rounded" />
+        <input
+          type="text"
+          name="artist"
+          value={formData.artist}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
+
       <div>
         <label className="block text-gray-700">Harga Tiket</label>
-        <input type="number" name="price" value={formData.price} onChange={handleChange} required className="w-full border p-2 rounded" />
+        <input
+          type="number"
+          name="price"
+          value={formData.price}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
+
       <div>
         <label className="block text-gray-700">Total Tiket</label>
-        <input type="number" name="totalTickets" value={formData.totalTickets} onChange={handleChange} required className="w-full border p-2 rounded" />
+        <input
+          type="number"
+          name="totalTickets"
+          value={formData.totalTickets}
+          onChange={handleChange}
+          required
+          className="w-full border p-2 rounded"
+        />
       </div>
+
       <div>
         <label className="block text-gray-700">URL Gambar</label>
-        <input type="text" name="imageUrl" value={formData.imageUrl} onChange={handleChange} className="w-full border p-2 rounded" />
+        <input
+          type="text"
+          name="imageUrl"
+          value={formData.imageUrl}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        />
       </div>
+
       <div>
         <label className="block text-gray-700">Kategori</label>
-        <select name="categoryId" value={formData.categoryId} onChange={handleChange} className="w-full border p-2 rounded">
+        <select
+          name="categoryId"
+          value={formData.categoryId}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        >
           <option value="">Pilih Kategori</option>
-          {categories.map((category: any) => (
-            <option key={category.id} value={category.id}>{category.name}</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
           ))}
         </select>
       </div>
-      <button type="submit" disabled={loading} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400">
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
+      >
         {isEditMode ? 'Simpan Perubahan' : 'Tambahkan Event'}
       </button>
     </form>

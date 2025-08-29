@@ -19,22 +19,22 @@ export const metadata: Metadata = {
   description: "Generated with Next.js & Tailwind CSS",
 };
 
+// src/app/layout.tsx
+// ...
 export default function RootLayout({
   children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased text-light-text bg-gradient-to-b from-dark-blue to-light-dark-blue min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased text-light-text`}
       >
         <Navbar />
-
-        {/* 🔴 Tailwind Test */}
-        <div className="bg-red-500 text-white p-4 text-center">
-          Tailwind Test — Kalau kotak merah ini muncul, Tailwind aktif ✅
-        </div>
-
-        <main className="pt-20">{children}</main>
+        <main className="pt-20 bg-black min-h-screen"> {/* <-- Ganti bg-dark-blue di sini */}
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

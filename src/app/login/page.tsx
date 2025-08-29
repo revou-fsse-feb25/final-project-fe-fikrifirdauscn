@@ -11,16 +11,19 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     try {
       const response = await apiClient.post('/auth/login', { email, password });
-      const { access_token, user } = response.data;
+      const { access_token, user } = response.data as {
+        access_token: string;
+        user: { name?: string; email?: string };
+      };
 
       localStorage.setItem('token', access_token);
 
-      alert(`Login berhasil! Selamat datang, ${user.name || user.email}`);
+      alert(`Login berhasil! Selamat datang, ${user.name || user.email || 'pengguna'}`);
 
       const redirectUrl = localStorage.getItem('redirectUrl');
       if (redirectUrl) {
@@ -29,11 +32,10 @@ export default function LoginPage() {
       } else {
         router.push('/');
       }
-
       router.refresh();
-    } catch (err: any) {
-      if (err.response) {
-        setError(err.response.data.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Terjadi kesalahan. Mohon coba lagi.');
       } else {
         setError('Terjadi kesalahan. Mohon coba lagi.');
       }
@@ -45,6 +47,7 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="p-8 bg-white rounded shadow-md w-96">
         <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
             Email
@@ -54,10 +57,11 @@ export default function LoginPage() {
             type="email"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             required
           />
         </div>
+
         <div className="mb-6">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
             Password
@@ -67,10 +71,11 @@ export default function LoginPage() {
             type="password"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             required
           />
         </div>
+
         <div className="flex items-center justify-between">
           <button
             type="submit"
