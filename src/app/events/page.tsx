@@ -4,7 +4,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '@/services/api';
 import EventCard from '@/components/EventCard';
-import { useRouter } from 'next/navigation';
 
 interface Event {
   id: string;
@@ -16,30 +15,31 @@ interface Event {
   imageUrl?: string;
 }
 
+interface Category { id: string; name: string }
+
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
-  const [categories, setCategories] = useState<{ id: string, name: string }[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
-  const router = useRouter();
 
   const fetchEvents = useCallback(async (name: string, categoryId: string) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const params: { name?: string, categoryId?: string } = {};
+      const params: { name?: string; categoryId?: string } = {};
       if (name) params.name = name;
       if (categoryId) params.categoryId = categoryId;
 
-      const response = await apiClient.get('/events', {
+      const response = await apiClient.get<Event[]>('/events', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         params,
       });
       setEvents(response.data);
       setError(null);
-    } catch (err: any) {
+    } catch {
       setError('Gagal mengambil data event. Mohon coba lagi.');
     } finally {
       setLoading(false);
@@ -49,12 +49,12 @@ export default function EventsPage() {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await apiClient.get('/categories', {
+      const response = await apiClient.get<Category[]>('/categories', {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setCategories(response.data);
-    } catch (err) {
-      console.error('Failed to fetch categories', err);
+    } catch {
+      console.error('Failed to fetch categories');
     }
   };
 
@@ -62,10 +62,7 @@ export default function EventsPage() {
     const handler = setTimeout(() => {
       fetchEvents(searchTerm, selectedCategory);
     }, 500);
-
-    return () => {
-      clearTimeout(handler);
-    };
+    return () => clearTimeout(handler);
   }, [searchTerm, selectedCategory, fetchEvents]);
 
   useEffect(() => {

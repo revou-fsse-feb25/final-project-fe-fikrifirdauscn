@@ -1,6 +1,7 @@
 // src/app/dashboard/page.tsx
 'use client';
 
+import { Suspense } from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { apiClient } from '@/services/api';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -11,14 +12,16 @@ interface Booking {
   numberOfTickets: number;
   totalPrice: number;
   bookingDate: string;
-  event: {
-    name: string;
-    date: string;
-    location: string;
-  };
+  event: { name: string; date: string; location: string };
 }
 
-export default function UserDashboardPage() {
+type ApiError = { response?: { data?: { message?: string } } };
+const errMsg = (e: unknown, fallback: string) =>
+  (typeof e === 'object' && e !== null && 'response' in e
+    ? (e as ApiError).response?.data?.message ?? fallback
+    : fallback);
+
+function DashboardContent() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,19 +36,12 @@ export default function UserDashboardPage() {
         router.push('/login');
         return;
       }
-
-      const response = await apiClient.get('/bookings/my', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await apiClient.get<Booking[]>('/bookings/my', {
+        headers: { Authorization: `Bearer ${token}` },
       });
       setBookings(response.data);
-    } catch (err: any) {
-      if (err instanceof Error) {
-        setError(err.message || 'Gagal mengambil data booking. Mohon coba lagi.');
-      } else {
-        setError('Gagal mengambil data booking. Mohon coba lagi.');
-      }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Gagal mengambil data booking. Mohon coba lagi.');
     } finally {
       setLoading(false);
     }
@@ -69,16 +65,13 @@ export default function UserDashboardPage() {
       const token = localStorage.getItem('token');
       if (!token) return router.push('/login');
 
-      await apiClient.delete(`/bookings/${bookingId}`, {
+      await apiClient.delete<void>(`/bookings/${bookingId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert('Pemesanan berhasil dibatalkan!');
-
-      // Perbarui state secara lokal
-      setBookings(bookings.filter(booking => booking.id !== bookingId));
-
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Gagal membatalkan pesanan.');
+      setBookings(prev => prev.filter(booking => booking.id !== bookingId));
+    } catch (e: unknown) {
+      alert(errMsg(e, 'Gagal membatalkan pesanan.'));
     }
   };
 
@@ -110,7 +103,7 @@ export default function UserDashboardPage() {
                 <p className="text-sm text-gray-400">Lokasi: {booking.event.location}</p>
                 <p className="text-sm mt-2">Jumlah Tiket: {booking.numberOfTickets}</p>
                 <p className="font-semibold mt-2">Total Harga: Rp {booking.totalPrice.toLocaleString('id-ID')}</p>
-                <button 
+                <button
                   onClick={() => handleCancelBooking(booking.id)}
                   className="mt-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm hover:bg-red-600 transition-colors"
                 >
@@ -129,5 +122,13 @@ export default function UserDashboardPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function UserDashboardPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center min-h-screen text-light-text">Memuat...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }

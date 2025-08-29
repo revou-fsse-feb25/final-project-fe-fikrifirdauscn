@@ -1,4 +1,3 @@
-// src/app/admin/dashboard/events/page.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -19,10 +18,14 @@ interface Event {
   availableTickets: number;
   imageUrl?: string;
   categoryId?: string;
-  category?: {
-    name: string;
-  };
+  category?: { name: string };
 }
+
+type ApiError = { response?: { data?: { message?: string } } };
+const errMsg = (e: unknown, fallback: string) =>
+  (typeof e === 'object' && e !== null && 'response' in e
+    ? (e as ApiError).response?.data?.message ?? fallback
+    : fallback);
 
 export default function AdminManageEventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -40,14 +43,13 @@ export default function AdminManageEventsPage() {
         router.push('/login');
         return;
       }
-
-      const response = await apiClient.get('/events', {
+      const response = await apiClient.get<Event[]>('/events', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setEvents(response.data);
       setError(null);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Gagal mengambil data event.');
+    } catch (e: unknown) {
+      setError(errMsg(e, 'Gagal mengambil data event.'));
     } finally {
       setLoading(false);
       setIsFormVisible(false);
@@ -72,21 +74,16 @@ export default function AdminManageEventsPage() {
 
   const handleDelete = async (eventId: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus event ini?')) return;
-
     try {
       const token = localStorage.getItem('token');
       if (!token) return router.push('/login');
-
-      await apiClient.delete(`/events/${eventId}`, {
+      await apiClient.delete<void>(`/events/${eventId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert('Event berhasil dihapus!');
-
-      // Perbarui state secara lokal
-      setEvents(events.filter(event => event.id !== eventId));
-
-    } catch (err: any) {
-      alert(err.response?.data?.message || 'Gagal menghapus event.');
+      setEvents(prev => prev.filter(event => event.id !== eventId));
+    } catch (e: unknown) {
+      alert(errMsg(e, 'Gagal menghapus event.'));
     }
   };
 
@@ -105,14 +102,14 @@ export default function AdminManageEventsPage() {
       <h1 className="text-3xl font-bold text-center mb-8">Manajemen Event</h1>
 
       <div className="flex justify-center space-x-4 mb-8">
-        <Link 
-          href="/admin/dashboard" 
+        <Link
+          href="/admin/dashboard"
           className={`p-4 rounded-lg shadow-md transition-colors ${isActive('/admin/dashboard') ? 'bg-light-dark-blue hover:bg-opacity-80' : 'bg-dark-blue hover:bg-light-dark-blue'}`}
         >
           Lihat Semua Pemesanan
         </Link>
-        <Link 
-          href="/admin/dashboard/events" 
+        <Link
+          href="/admin/dashboard/events"
           className={`p-4 rounded-lg shadow-md transition-colors ${isActive('/admin/dashboard/events') ? 'bg-magenta text-white' : 'bg-light-dark-blue hover:bg-opacity-80'}`}
         >
           Kelola Event
@@ -122,7 +119,10 @@ export default function AdminManageEventsPage() {
       <div className="bg-light-dark-blue rounded-lg shadow-xl p-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Daftar Event</h2>
-          <button onClick={() => { setIsFormVisible(!isFormVisible); setSelectedEvent(null); }} className="bg-magenta text-white p-2 rounded hover:bg-opacity-80">
+          <button
+            onClick={() => { setIsFormVisible(v => !v); setSelectedEvent(null); }}
+            className="bg-magenta text-white p-2 rounded hover:bg-opacity-80"
+          >
             {isFormVisible ? 'Tutup Form' : 'Tambah Event'}
           </button>
         </div>

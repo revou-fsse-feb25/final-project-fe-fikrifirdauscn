@@ -1,9 +1,15 @@
-// src/app/login/page.tsx
 'use client';
 
 import { useState } from 'react';
 import { apiClient } from '@/services/api';
 import { useRouter } from 'next/navigation';
+
+interface LoginResponse {
+  access_token: string;
+  user: { name?: string; email: string };
+}
+
+type ApiError = { response?: { data?: { message?: string } } };
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -15,13 +21,13 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     try {
-      const response = await apiClient.post('/auth/login', { email, password });
+      const response = await apiClient.post<LoginResponse>('/auth/login', { email, password });
       const { access_token, user } = response.data;
-      
+
       localStorage.setItem('token', access_token);
-      
+
       alert(`Login berhasil! Selamat datang, ${user.name || user.email}`);
-      
+
       const redirectUrl = localStorage.getItem('redirectUrl');
       if (redirectUrl) {
         localStorage.removeItem('redirectUrl');
@@ -29,14 +35,13 @@ export default function LoginPage() {
       } else {
         router.push('/');
       }
-      
       router.refresh();
-    } catch (err: any) {
-      if (err.response) {
-        setError(err.response.data.message);
-      } else {
-        setError('Terjadi kesalahan. Mohon coba lagi.');
-      }
+    } catch (e: unknown) {
+      const msg =
+        typeof e === 'object' && e && 'response' in e
+          ? (e as ApiError).response?.data?.message ?? 'Terjadi kesalahan. Mohon coba lagi.'
+          : 'Terjadi kesalahan. Mohon coba lagi.';
+      setError(msg);
     }
   };
 
@@ -46,9 +51,7 @@ export default function LoginPage() {
         <h1 className="text-2xl font-bold mb-4 text-center">Login</h1>
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
         <div className="mb-4">
-          <label className="block text-sm font-bold mb-2" htmlFor="email">
-            Email
-          </label>
+          <label className="block text-sm font-bold mb-2" htmlFor="email">Email</label>
           <input
             id="email"
             type="email"
@@ -59,9 +62,7 @@ export default function LoginPage() {
           />
         </div>
         <div className="mb-6">
-          <label className="block text-sm font-bold mb-2" htmlFor="password">
-            Password
-          </label>
+          <label className="block text-sm font-bold mb-2" htmlFor="password">Password</label>
           <input
             id="password"
             type="password"
@@ -72,10 +73,7 @@ export default function LoginPage() {
           />
         </div>
         <div className="flex items-center justify-between">
-          <button
-            type="submit"
-            className="bg-magenta hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          >
+          <button type="submit" className="bg-magenta hover:bg-opacity-80 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
             Masuk
           </button>
         </div>
