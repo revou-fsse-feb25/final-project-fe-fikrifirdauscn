@@ -70,7 +70,7 @@ npm run format       # Format (if configured)
 
 ---
 ## 5) Links to Frontend:
-Frontend: (https://final-project-be-fikrifirdauscn-production.up.railway.app/)
+Frontend: (https://final-project-fe-fikrifirdauscn-vts.vercel.app/)
 
 ---
 ## 6) Screenshots:
